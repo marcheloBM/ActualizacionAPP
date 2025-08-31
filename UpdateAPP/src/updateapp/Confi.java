@@ -18,7 +18,7 @@ public interface Confi {
     //Configuraciones para Update
     static String nameArchivo = "UpdateAPP.zip";
     static String CarpetaUpdate = "Update/";
-    static String Version = "1.3";
-    static String UrlVersion = "https://raw.githubusercontent.com/marchelo1989/ActualizacionAPP/main/version.txt";
-    static String UrlDescarga = "https://raw.githubusercontent.com/marchelo1989/ActualizacionAPP/main/Descargas.txt";
+    static String Version = "1.0";
+    static String UrlVersion = "https://raw.githubusercontent.com/marcheloBM/ActualizacionAPP/refs/heads/main/version.txt";
+    static String UrlDescarga = "https://raw.githubusercontent.com/marcheloBM/ActualizacionAPP/refs/heads/main/Descargas.txt";
 }

@@ -19,10 +19,11 @@ public class UpdateAPP {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        boolean resp =buscarUpdate();
-        if(resp==false){
-            new FrHome().setVisible(true);
-        }
+        GitHubReleaseGUI.main(args);
+//        boolean resp =buscarUpdate();
+//        if(resp==false){
+//            new FrHome().setVisible(true);
+//        }
         
     }
     public static boolean buscarUpdate(){

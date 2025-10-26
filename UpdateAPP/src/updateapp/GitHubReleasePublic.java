@@ -6,6 +6,7 @@ package updateapp;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 
 
@@ -26,7 +27,8 @@ public class GitHubReleasePublic {
         String apiUrl = "https://api.github.com/repos/" + owner + "/" + repo + "/releases";
 
         try {
-            URL url = new URL(apiUrl);
+            URI uri = new URI(apiUrl);
+            URL url = uri.toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/vnd.github.v3+json");

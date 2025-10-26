@@ -20,7 +20,7 @@ public class UpdateAPP {
     public static void main(String[] args) {
         // TODO code application logic here
         String repo = "https://github.com/marcheloBM/ActualizacionAPP";
-        String versionActual = "1.3";
+        String versionActual = "1.5";
 
         if (GitHubReleaseGUI.hayNuevaVersion(repo, versionActual)) {
             System.out.println("🟢 Hay una nueva versión disponible.");

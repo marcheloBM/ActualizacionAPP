@@ -6,8 +6,8 @@ import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
-
 
 public class GitHubReleaseGUI {
 
@@ -21,7 +21,8 @@ public class GitHubReleaseGUI {
     private static void createAndShowGUI() {
         JFrame frame = new JFrame("GitHub Release Viewer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 500);
+        frame.setSize(650, 550);
+        frame.setLocationRelativeTo(null);
 
         JTextField repoField = new JTextField("https://github.com/marcheloBM/ActualizacionAPP");
         JButton fetchButton = new JButton("Consultar Release");
@@ -35,8 +36,34 @@ public class GitHubReleaseGUI {
         outputArea.setEditable(false);
         outputArea.setLineWrap(true);
         outputArea.setWrapStyleWord(true);
+        outputArea.setFont(new Font("Consolas", Font.PLAIN, 14));
+        outputArea.setBackground(new Color(245, 245, 245));
         JScrollPane scrollPane = new JScrollPane(outputArea);
 
+        JProgressBar progressBar = new JProgressBar();
+        progressBar.setIndeterminate(true);
+        progressBar.setVisible(false);
+
+        // Panel superior
+        JPanel repoPanel = new JPanel();
+        repoPanel.setLayout(new BoxLayout(repoPanel, BoxLayout.X_AXIS));
+        repoPanel.setBorder(BorderFactory.createTitledBorder("Repositorio GitHub"));
+        repoPanel.add(repoField);
+        repoPanel.add(fetchButton);
+
+        // Panel inferior
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setBorder(BorderFactory.createTitledBorder("Acciones"));
+        buttonPanel.add(openGitHubButton);
+        buttonPanel.add(downloadButton);
+
+        // Panel central
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBorder(BorderFactory.createTitledBorder("Información del Release"));
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
+        centerPanel.add(progressBar, BorderLayout.SOUTH);
+
+        // Acciones
         fetchButton.addActionListener((ActionEvent e) -> {
             String repoUrl = repoField.getText().trim();
             outputArea.setText("Consultando...\n");
@@ -44,6 +71,7 @@ public class GitHubReleaseGUI {
             openGitHubButton.setEnabled(false);
             downloadUrl = "";
             releasePageUrl = "";
+            progressBar.setVisible(true);
 
             new Thread(() -> {
                 String result = fetchReleaseInfo(repoUrl);
@@ -51,13 +79,14 @@ public class GitHubReleaseGUI {
                     outputArea.setText(result);
                     downloadButton.setEnabled(!downloadUrl.isEmpty());
                     openGitHubButton.setEnabled(!releasePageUrl.isEmpty());
+                    progressBar.setVisible(false);
                 });
             }).start();
         });
 
         downloadButton.addActionListener((ActionEvent e) -> {
             try {
-                Desktop.getDesktop().browse(new URL(downloadUrl).toURI());
+                Desktop.getDesktop().browse(new URI(downloadUrl));
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "❌ Error al abrir el enlace de descarga.");
             }
@@ -65,25 +94,16 @@ public class GitHubReleaseGUI {
 
         openGitHubButton.addActionListener((ActionEvent e) -> {
             try {
-                Desktop.getDesktop().browse(new URL(releasePageUrl).toURI());
+                Desktop.getDesktop().browse(new URI(releasePageUrl));
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "❌ Error al abrir la página del release.");
             }
         });
 
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.add(repoField, BorderLayout.CENTER);
-        topPanel.add(fetchButton, BorderLayout.EAST);
-
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bottomPanel.add(openGitHubButton);
-        bottomPanel.add(downloadButton);
-
         frame.setLayout(new BorderLayout());
-        frame.add(topPanel, BorderLayout.NORTH);
-        frame.add(scrollPane, BorderLayout.CENTER);
-        frame.add(bottomPanel, BorderLayout.SOUTH);
-
+        frame.add(repoPanel, BorderLayout.NORTH);
+        frame.add(centerPanel, BorderLayout.CENTER);
+        frame.add(buttonPanel, BorderLayout.SOUTH);
         frame.setVisible(true);
     }
 
@@ -96,7 +116,8 @@ public class GitHubReleaseGUI {
             String repo = parts[1];
             String apiUrl = "https://api.github.com/repos/" + owner + "/" + repo + "/releases";
 
-            URL url = new URL(apiUrl);
+            URI uri = new URI(apiUrl);
+            URL url = uri.toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/vnd.github.v3+json");
@@ -155,4 +176,50 @@ public class GitHubReleaseGUI {
         int end = json.indexOf("\"", start);
         return end > start ? json.substring(start, end) : "";
     }
+    
+    public static boolean hayNuevaVersion(String repoUrl, String versionActual) {
+        try {
+            String[] parts = repoUrl.replace("https://github.com/", "").split("/");
+            if (parts.length < 2) return false;
+
+            String owner = parts[0];
+            String repo = parts[1];
+            String apiUrl = "https://api.github.com/repos/" + owner + "/" + repo + "/releases/latest";
+
+            URI uri = new URI(apiUrl);
+            URL url = uri.toURL();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/vnd.github.v3+json");
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder json = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                json.append(line);
+            }
+            reader.close();
+
+            String tag = extractValue(json.toString(), "\"tag_name\":\"");
+            return isNewerVersion(versionActual.replaceFirst("^v", ""), tag.replaceFirst("^v", ""));
+
+        } catch (Exception e) {
+            System.err.println("❌ Error al verificar versión: " + e.getMessage());
+            return false;
+        }
+    }
+    private static boolean isNewerVersion(String current, String remote) {
+        String[] currentParts = current.split("\\.");
+        String[] remoteParts = remote.split("\\.");
+
+        int length = Math.max(currentParts.length, remoteParts.length);
+        for (int i = 0; i < length; i++) {
+            int c = i < currentParts.length ? Integer.parseInt(currentParts[i]) : 0;
+            int r = i < remoteParts.length ? Integer.parseInt(remoteParts[i]) : 0;
+            if (r > c) return true;
+            if (r < c) return false;
+        }
+        return false;
+    }
+
 }

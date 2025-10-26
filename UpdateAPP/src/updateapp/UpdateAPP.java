@@ -19,32 +19,42 @@ public class UpdateAPP {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        GitHubReleaseGUI.main(args);
+        String repo = "https://github.com/marcheloBM/ActualizacionAPP";
+        String versionActual = "1.3";
+
+        if (GitHubReleaseGUI.hayNuevaVersion(repo, versionActual)) {
+            System.out.println("🟢 Hay una nueva versión disponible.");
+            GitHubReleaseGUI.main(args);
+        } else {
+            System.out.println("✅ Estás usando la última versión.");
+        }
+
+//        GitHubReleaseGUI.main(args);
 //        boolean resp =buscarUpdate();
 //        if(resp==false){
 //            new FrHome().setVisible(true);
 //        }
         
     }
-    public static boolean buscarUpdate(){
-        boolean resp;
-        if(Actualizacion.verificarConexion()){
-            if(Actualizacion.obtenerVersion().equals(Confi.Version)){
-                resp=false;
-            }else{
-                resp=true;
-                int respu = JOptionPane.showConfirmDialog(null, "Version "+Actualizacion.obtenerVersion()+ " Diponible \n¿Desea Descargar?");
-                if(respu==0){
-                    JOptionPane.showMessageDialog(null, "Descargando Update \nEspere Mensaje");
-                    Actualizacion.descargarUpdate();
-                    resp=true;
-                }else{
-                    resp=false;
-                }
-            }
-        }else{
-            resp=false;
-        }
-        return resp;
-    }
+//    public static boolean buscarUpdate(){
+//        boolean resp;
+//        if(Actualizacion.verificarConexion()){
+//            if(Actualizacion.obtenerVersion().equals(Confi.Version)){
+//                resp=false;
+//            }else{
+//                resp=true;
+//                int respu = JOptionPane.showConfirmDialog(null, "Version "+Actualizacion.obtenerVersion()+ " Diponible \n¿Desea Descargar?");
+//                if(respu==0){
+//                    JOptionPane.showMessageDialog(null, "Descargando Update \nEspere Mensaje");
+//                    Actualizacion.descargarUpdate();
+//                    resp=true;
+//                }else{
+//                    resp=false;
+//                }
+//            }
+//        }else{
+//            resp=false;
+//        }
+//        return resp;
+//    }
 }

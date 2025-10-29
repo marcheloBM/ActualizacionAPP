@@ -20,13 +20,29 @@ public class UpdateAPP {
     public static void main(String[] args) {
         // TODO code application logic here
         String repo = "https://github.com/marcheloBM/ActualizacionAPP";
-        String versionActual = "1.5";
+        String versionActual = "1.6";
 
-        if (GitHubReleaseGUI.hayNuevaVersion(repo, versionActual)) {
-            System.out.println("🟢 Hay una nueva versión disponible.");
-            GitHubReleaseGUI.main(args);
+        String ultimaVersion = GitHubReleaseGUI.obtenerUltimaVersion(repo);
+
+        if (ultimaVersion == null) {
+            JOptionPane.showMessageDialog(null, "⚠️ No se pudo verificar la versión.");
+            //Inicia el programa si no se puede verificar
+            new FrInicio().setVisible(true);
+        } else if (ultimaVersion.equals(versionActual)) {
+            //JOptionPane.showMessageDialog(null, "✅ Estás usando la última versión (" + versionActual + ").");
+            //Si estamos usando la version actual
+            new FrInicio().setVisible(true);
         } else {
-            System.out.println("✅ Estás usando la última versión.");
+            JOptionPane.showMessageDialog(null, "🟢 Hay una nueva versión disponible: " + ultimaVersion);
+            int respu = JOptionPane.showConfirmDialog(null, "¿Desea descargar la nueva versión?");
+            if (respu == JOptionPane.YES_OPTION) {
+                //Abrimos para descargar la nueva version
+                GitHubReleaseGUI.main(args);
+            } else {
+                JOptionPane.showMessageDialog(null, "Intente mantener el programa actualizado.");
+                //Si no queremos actualizar a la ultima Version
+                new FrInicio().setVisible(true);
+            }
         }
 
 //        GitHubReleaseGUI.main(args);

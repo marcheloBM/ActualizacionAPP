@@ -221,5 +221,35 @@ public class GitHubReleaseGUI {
         }
         return false;
     }
+    public static String obtenerUltimaVersion(String repoUrl) {
+        try {
+            String[] parts = repoUrl.replace("https://github.com/", "").split("/");
+            if (parts.length < 2) return null;
 
+            String owner = parts[0];
+            String repo = parts[1];
+            String apiUrl = "https://api.github.com/repos/" + owner + "/" + repo + "/releases/latest";
+
+            URI uri = new URI(apiUrl);
+            URL url = uri.toURL();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/vnd.github.v3+json");
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder json = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                json.append(line);
+            }
+            reader.close();
+
+            String tag = extractValue(json.toString(), "\"tag_name\":\"");
+            return tag.replaceFirst("^v", "").trim(); // Limpia el prefijo "v" si existe
+
+        } catch (Exception e) {
+            System.err.println("❌ Error al obtener versión remota: " + e.getMessage());
+            return null;
+        }
+    }
 }

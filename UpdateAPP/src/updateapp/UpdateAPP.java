@@ -23,30 +23,30 @@ public class UpdateAPP {
 
         String ultimaVersion = GitHubReleaseGUI.obtenerUltimaVersion(repo);
 
-    if (ultimaVersion == null) {
-        JOptionPane.showMessageDialog(null, "⚠️ No se pudo verificar la versión.");
-        //Inicia el programa si no se puede verificar
-        new FrInicio().setVisible(true);
-    } else if (ultimaVersion.equals(versionActual)) {
-        // Estás usando la última versión publicada
-        new FrInicio().setVisible(true);
-    } else if (compararVersiones(versionActual, ultimaVersion) > 0) {
-        // Estás usando una versión más nueva que la publicada
-        JOptionPane.showMessageDialog(null, "🧪 Estás usando una versión en desarrollo (" + versionActual + ").");
-        new FrInicio().setVisible(true);
-    } else {
-        // Hay una versión más nueva publicada
-        JOptionPane.showMessageDialog(null, "🟢 Hay una nueva versión disponible: " + ultimaVersion);
-        int respu = JOptionPane.showConfirmDialog(null, "¿Desea descargar la nueva versión?");
-        if (respu == JOptionPane.YES_OPTION) {
-            //Abrimos para descargar la nueva version
-            GitHubReleaseGUI.main(args);
+        if (ultimaVersion == null) {
+            JOptionPane.showMessageDialog(null, "⚠️ No se pudo verificar la versión.");
+            //Inicia el programa si no se puede verificar
+            interzas();
+        } else if (ultimaVersion.equals(versionActual)) {
+            // Estás usando la última versión publicada
+            interzas();
+        } else if (compararVersiones(versionActual, ultimaVersion) > 0) {
+            // Estás usando una versión más nueva que la publicada
+            JOptionPane.showMessageDialog(null, "🧪 Estás usando una versión en desarrollo (" + versionActual + ").");
+            interzas();
         } else {
-            JOptionPane.showMessageDialog(null, "Intente mantener el programa actualizado.");
-            //Si no queremos actualizar a la ultima Version
-            new FrInicio().setVisible(true);
+            // Hay una versión más nueva publicada
+            JOptionPane.showMessageDialog(null, "🟢 Hay una nueva versión disponible: " + ultimaVersion);
+            int respu = JOptionPane.showConfirmDialog(null, "¿Desea descargar la nueva versión?");
+            if (respu == JOptionPane.YES_OPTION) {
+                //Abrimos para descargar la nueva version
+                GitHubReleaseGUI.main(args);
+            } else {
+                JOptionPane.showMessageDialog(null, "Intente mantener el programa actualizado.");
+                //Si no queremos actualizar a la ultima Version
+                interzas();
+            }
         }
-    }
     
 //        GitHubReleaseGUI.main(args);
 //        boolean resp =buscarUpdate();
@@ -54,6 +54,9 @@ public class UpdateAPP {
 //            new FrHome().setVisible(true);
 //        }
         
+    }
+    public static void interzas(){
+        new FrInicio().setVisible(true);
     }
     public static int compararVersiones(String v1, String v2) {
         String[] a = v1.split("\\.");

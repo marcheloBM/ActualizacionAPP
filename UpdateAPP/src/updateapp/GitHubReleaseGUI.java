@@ -24,7 +24,7 @@ public class GitHubReleaseGUI {
         frame.setSize(650, 550);
         frame.setLocationRelativeTo(null);
 
-        JTextField repoField = new JTextField("https://github.com/marcheloBM/ActualizacionAPP");
+        JTextField repoField = new JTextField(Confi.repositorio);
         JButton fetchButton = new JButton("Consultar Release");
         JButton downloadButton = new JButton("Descargar archivo");
         JButton openGitHubButton = new JButton("Ver en GitHub");

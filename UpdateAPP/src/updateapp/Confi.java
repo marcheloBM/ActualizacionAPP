@@ -12,6 +12,11 @@ package updateapp;
  */
 public interface Confi {
     
+    //Configuracion Nuevo Update
+    static String repositorio = "https://github.com/marcheloBM/ActualizacionAPP";
+    static String versionActual = "1.7";
+    
+    
     //Configuracion de Directorio
     static String SO = System.getProperty("os.name");
     
